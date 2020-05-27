@@ -1,5 +1,5 @@
 import React from 'react';
-var moment = require('moment');
+import moment from 'moment';
 
 class WeekContainer extends React.Component {
   state = {
@@ -26,20 +26,22 @@ class WeekContainer extends React.Component {
       const location = this.state.data.timezone;
 
     //  MOMENT.JS PROBLEM!
-      const weekday = this.state.dailyData.map(({ dt }) => (
-          <li>{dt}</li>
-      ));
-      let newDate = new Date();
-      newDate.setTime(weekday)
-      moment(newDate).format('dddd');
+
+    // ---- UNIX timestamps are not standardised whether or not they are in Milliseconds or seconds so
+    // Sometimes you have to multiply by 1000 to get packages like moment to work. You should also import
+    // packages like moment in the react way. :) See above.
+  
 
     //   const imgURL = `owf owf-${reading.weather[0].id} owf-5x`; WEATHER ICONS (In public folder is styles)
 
       const listItems = this.state.dailyData.map(
-        ({ weather: [{ description, icon, main, id }] }) => (
+        // note that dt is now included here on the left
+        ({ dt, weather: [{ description, icon, main, id }] }) => (
           <>
-            <li>{moment(newDate).format('dddd')}</li>
+            <li>{moment(dt * 1000).format('dddd')}</li>
             {/* I NEED TO IMPORT WEATHER ICONS TO HERE w/ id */}
+            {/* Here you must conditionally build up the url source link to the image using the ID and really cool template literals*/}
+            <li><img src={`http://openweathermap.org/img/wn/${icon}.png`}/></li>
             <li>{id}</li>
             <li>{description}</li>
             <li>{icon}</li>
