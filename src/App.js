@@ -1,14 +1,74 @@
 import React from 'react';
-import logo from './logo.svg';
-import './App.css';
-import WeekContainer from './WeekContainer';
+import moment from 'moment';
 
-function App() {
-  return (
-    <div className="App">
-      <WeekContainer />
-    </div>
-  );
+class App extends React.Component {
+  //state
+  state = {
+    userPosition: {
+      latitude: 35,
+      longitude: 139,
+    },
+    data: [],
+    dailyData: [],
+  };
+
+  componentDidMount() {
+    //check whether geolocation is supported
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition((position) => {
+        //get the lat and long of your device
+        let pos = {
+          latitude: position.coords.latitude,
+          longitude: position.coords.longitude,
+        };
+
+        this.setState({ userPosition: pos });
+
+        //Weather Api call
+        fetch(
+          `https://api.openweathermap.org/data/2.5/onecall?lat=${this.state.userPosition.latitude}&lon=${this.state.userPosition.longitude}&%20exclude=minutely&appid=${process.env.REACT_APP_WEATHER_KEY}`
+        )
+          .then((response) => response.json())
+          .then((data) => {
+            this.setState({ data: data, dailyData: data.daily });
+          });
+      });
+    }
+  }
+
+  render() {
+    const location = this.state.data.timezone;
+    const listItems = this.state.dailyData.map(
+      ({ dt, temp: { day }, weather: [{ description, icon, main, id }] }) => (
+        <ul key={dt}>
+          <li>{moment(dt * 1000).format('dddd')}</li>
+          <li>{moment(dt * 1000).format('MMMM Do, h:mm a')}</li>
+          <li>
+            <img
+              src={`http://openweathermap.org/img/wn/${icon}.png`}
+              alt='weather icon'
+            />
+          </li>
+          <li>{Math.round(day - 273.15)}°C</li>
+          <li>{description}</li>
+        </ul>
+      )
+    );
+    const DivStyles = {
+      margin: '10px',
+      padding: '10px',
+      display: 'flex',
+      flexWrap: 'wrap',
+      justifyContent: 'center',
+    };
+    return (
+      <>
+        <h1>{location}</h1>
+        <h2>8 Day Weather Forecast</h2>
+        <div style={DivStyles}>{listItems}</div>
+      </>
+    );
+  }
 }
 
 export default App;
