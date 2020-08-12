@@ -1,12 +1,12 @@
 import React from 'react';
 import moment from 'moment';
 
-class App extends React.Component {
+export default class App extends React.Component {
   //state
   state = {
     userPosition: {
-      latitude: 35,
-      longitude: 139,
+      latitude: {},
+      longitude: {},
     },
     data: [],
     dailyData: [],
@@ -23,10 +23,8 @@ class App extends React.Component {
         };
 
         this.setState({ userPosition: pos });
-
-        //Weather Api call
         fetch(
-          `https://api.openweathermap.org/data/2.5/onecall?lat=${this.state.userPosition.latitude}&lon=${this.state.userPosition.longitude}&%20exclude=minutely&appid=${process.env.REACT_APP_WEATHER_KEY}`
+          `https://api.openweathermap.org/data/2.5/onecall?lat=${this.state.userPosition.latitude}&lon=${this.state.userPosition.longitude}&%20exclude=minutely&appid=128944992833eb85f19eeebe5415027c`
         )
           .then((response) => response.json())
           .then((data) => {
@@ -70,5 +68,3 @@ class App extends React.Component {
     );
   }
 }
-
-export default App;
